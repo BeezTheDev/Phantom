@@ -67,11 +67,37 @@ FVector FAircraftFlightInfo::GetFlightEnd()
 	return FlightStartLocation + Direction * (FlightSpeed * TimeTillFlightEnd);
 }
 
+FGameplayAbilitySpec* UAbilitySystemComponent::FindAbilitySpecFromClass(TSubclassOf<UGameplayAbility> InAbilityClass)
+{
+	for (FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
+	{
+		if (Spec.Ability->Class == InAbilityClass)
+		{
+			return &Spec;
+		}
+	}
+
+	return nullptr;
+}
+
 void FFortItemEntry::SetLoadedAmmo(int InCount)
 {
 	if (InCount != LoadedAmmo)
 	{
 		LoadedAmmo = InCount;
+
+		if (AFortInventory* FortInventory = ParentInventory.Get())
+			FortInventory->SetItemRequiresUpdate(this);
+
+		bIsDirty = 1;
+	}
+}
+
+void FFortItemEntry::SetInInventoryOverflow(bool bOverflow)
+{
+	if (inventory_overflow_date != bOverflow)
+	{
+		inventory_overflow_date = bOverflow;
 
 		if (AFortInventory* FortInventory = ParentInventory.Get())
 			FortInventory->SetItemRequiresUpdate(this);
