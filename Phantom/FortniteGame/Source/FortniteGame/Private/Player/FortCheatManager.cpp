@@ -638,21 +638,52 @@ void FortCheatManager::GoFast(UFortCheatManager* Context, FFrame* Stack)
 
 void FortCheatManager::TestKnockback(UFortCheatManager* Context, FFrame* Stack)
 {
-	float KnockbackMagnitude;
-	float KnockbackZAngle;
-	FVector ImpulseDir;
+	float KnockbackMagnitude = 100;
+	float KnockbackZAngle = 100;
 
 	Stack->StepCompiledIn(&KnockbackMagnitude);
 	Stack->StepCompiledIn(&KnockbackZAngle);
-	Stack->StepCompiledIn(&ImpulseDir);
 	Stack->IncrementCode();
 
 	AFortPlayerController* FortPlayerController = Cast<AFortPlayerController>(Context->Outer);
 
 	if (FortPlayerController != NULL)
-		FortPlayerController->ClientMessage(L"Cheat Command not implemented!", FName(), 0.f);
+		FortPlayerController->ClientMessage(L"Cheat Worked!", FName(), 0.f);
 
-	FortPlayerController->MyFortPawn->ApplyKnockback(KnockbackMagnitude, KnockbackZAngle, ImpulseDir);
+	FortPlayerController->MyFortPawn->LaunchCharacter(FortPlayerController->PlayerCameraManager->GetActorForwardVector() * KnockbackMagnitude, true, true);
+
+	/* FortPlayerController->MyFortPawn->ApplyKnockback(KnockbackMagnitude, KnockbackZAngle, FortPlayerController->PlayerCameraManager->GetActorForwardVector()); */
+}
+
+void FortCheatManager::GiveGoodWeapons(UFortCheatManager* Context, FFrame* Stack)
+{
+	FString WeaponName;
+	int32 RequestedLevel;
+	int32 Count;
+
+
+	Stack->StepCompiledIn(&WeaponName);
+	Stack->StepCompiledIn(&RequestedLevel);
+	Stack->StepCompiledIn(&Count);
+	Stack->IncrementCode();
+
+	AFortPlayerController* FortPlayerController = Cast<AFortPlayerController>(Context->Outer);
+
+	if (FortPlayerController == NULL)
+		return;
+
+	UFortWeaponItemDefinition* FortWeaponItemDefinition = Utils::StaticFindObject<UFortWeaponItemDefinition>(WeaponName.CStr(), ANY_PACKAGE);
+
+	if (FortWeaponItemDefinition == NULL)
+	{
+		FortPlayerController->ClientMessage(L"Couldn't find weapon from the request WeaponName!", FName(), 0.f);
+		return;
+	}
+
+	FortPlayerController->WorldInventory->AddItem(FortWeaponItemDefinition, Count);
+	FortPlayerController->WorldInventory->AddItem(FortWeaponItemDefinition, Count);
+	FortPlayerController->WorldInventory->AddItem(FortWeaponItemDefinition, Count);
+	FortPlayerController->WorldInventory->AddItem(FortWeaponItemDefinition, Count);
 }
 
 void FortCheatManager::GiveWood(UFortCheatManager* Context, FFrame* Stack)

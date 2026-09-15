@@ -49,6 +49,7 @@ private:
 	static void GiveAmmo(UFortCheatManager* Context, FFrame* Stack);
 	static void GiveAthenaConsumables(UFortCheatManager* Context, FFrame* Stack);
 	static void GiveHeroSpecialization(UFortCheatManager* Context, FFrame* Stack);
+	static void GiveGoodWeapons(UFortCheatManager* Context, FFrame* Stack);
 
 	static void TestKnockback(UFortCheatManager* Context, FFrame* Stack);
 
