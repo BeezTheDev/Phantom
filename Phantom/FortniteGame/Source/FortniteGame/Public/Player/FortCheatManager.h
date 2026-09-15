@@ -30,6 +30,8 @@ private:
 	static void CraftFree(UFortCheatManager* Context, FFrame* Stack);
 	static void ForceServerShutdown(UFortCheatManager* Context, FFrame* Stack);
 
+	static void SkipSafeZones(UFortCheatManager* Context, FFrame* Stack);
+
 	static void GiveAllIngredients(UFortCheatManager* Context, FFrame* Stack);
 	static void GiveConsumable(UFortCheatManager* Context, FFrame* Stack);
 	static void GiveGadget(UFortCheatManager* Context, FFrame* Stack);
@@ -44,6 +46,11 @@ private:
 	static void GiveMetal(UFortCheatManager* Context, FFrame* Stack);
 	static void GiveStone(UFortCheatManager* Context, FFrame* Stack);
 	static void GiveBluGlo(UFortCheatManager* Context, FFrame* Stack);
+	static void GiveAmmo(UFortCheatManager* Context, FFrame* Stack);
+	static void GiveAthenaConsumables(UFortCheatManager* Context, FFrame* Stack);
+	static void GiveHeroSpecialization(UFortCheatManager* Context, FFrame* Stack);
+
+	static void TestKnockback(UFortCheatManager* Context, FFrame* Stack);
 
 	static void MassSuicide(UFortCheatManager* Context, FFrame* Stack);
 

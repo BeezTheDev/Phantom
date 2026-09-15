@@ -55,9 +55,12 @@ void FortCheatManager::AddCombatScore(UFortCheatManager* Context, FFrame* Stack)
 
 void FortCheatManager::AddKillFeedMessage(UFortCheatManager* Context, FFrame* Stack)
 {
+	FText EntryFeedText;
+
 	Stack->IncrementCode();
 
 	AFortPlayerController* FortPlayerController = Cast<AFortPlayerController>(Context->Outer);
+	AFortGameStateAthena* FortGameStateAthena = Cast<AFortGameStateAthena>(Context->Outer);
 
 	if (FortPlayerController == NULL)
 		return;
@@ -546,6 +549,80 @@ void FortCheatManager::GiveWeapon(UFortCheatManager* Context, FFrame* Stack)
 	FortPlayerController->WorldInventory->AddItem(FortWeaponItemDefinition, Count);
 }
 
+void FortCheatManager::GiveAmmo(UFortCheatManager* Context, FFrame* Stack)
+{
+	int32 Count;
+	FString AmmoType;
+
+	Stack->StepCompiledIn(&Count);
+	Stack->StepCompiledIn(&AmmoType);
+	Stack->IncrementCode();
+
+	AFortPlayerController* FortPlayerController = Cast<AFortPlayerController>(Context->Outer);
+
+	if (FortPlayerController == NULL)
+		return;
+
+	UFortItemDefinition* FortItemDefinition = Utils::StaticFindObject<UFortItemDefinition>(AmmoType.CStr(), ANY_PACKAGE);
+
+	if (FortItemDefinition == NULL)
+	{
+		FortPlayerController->ClientMessage(L"Couldn't find ammo from the request AmmoType!", FName(), 0.f);
+		return;
+	}
+
+	FortPlayerController->WorldInventory->AddItem(FortItemDefinition, Count);
+}
+
+void FortCheatManager::GiveHeroSpecialization(UFortCheatManager* Context, FFrame* Stack)
+{
+	FString Specialization;
+	int32 Count;
+
+	Stack->StepCompiledIn(&Specialization);
+	Stack->IncrementCode();
+
+	AFortPlayerControllerAthena* FortPlayerControllerAthena = Cast<AFortPlayerControllerAthena>(Context->Outer);
+
+	if (FortPlayerControllerAthena == NULL)
+		return;
+
+	UFortHeroSpecialization* FortHeroSpecialization = Utils::StaticFindObject<UFortHeroSpecialization>(Specialization.CStr(), ANY_PACKAGE);
+
+	if (FortHeroSpecialization == NULL)
+	{
+		FortPlayerControllerAthena->ClientMessage(L"Couldn't find Hero from the request Specialization!", FName(), 0.f);
+		return;
+	}
+
+	FortPlayerControllerAthena->ClientAddHeroSpecialization(FortHeroSpecialization);
+}
+
+void FortCheatManager::GiveAthenaConsumables(UFortCheatManager* Context, FFrame* Stack)
+{
+	FString ConsumablesName;
+	int32 Count;
+
+	Stack->StepCompiledIn(&ConsumablesName);
+	Stack->StepCompiledIn(&Count);
+	Stack->IncrementCode();
+
+	AFortPlayerControllerAthena* FortPlayerControllerAthena = Cast<AFortPlayerControllerAthena>(Context->Outer);
+
+	if (FortPlayerControllerAthena == NULL)
+		return;
+
+	UFortConsumableItemDefinition* FortConsumableItemDefinition = Utils::StaticFindObject<UFortConsumableItemDefinition>(ConsumablesName.CStr(), ANY_PACKAGE);
+
+	if (FortConsumableItemDefinition == NULL)
+	{
+		FortPlayerControllerAthena->ClientMessage(L"Couldn't find consumable from the request ConsumablesName!", FName(), 0.f);
+		return;
+	}
+
+	FortPlayerControllerAthena->WorldInventory->AddItem(FortConsumableItemDefinition, Count);
+}
+
 void FortCheatManager::GoFast(UFortCheatManager* Context, FFrame* Stack)
 {
 	float NewSpeed;
@@ -557,6 +634,25 @@ void FortCheatManager::GoFast(UFortCheatManager* Context, FFrame* Stack)
 
 	if (FortPlayerController != NULL)
 		FortPlayerController->ClientMessage(L"Cheat Command not implemented!", FName(), 0.f);
+}
+
+void FortCheatManager::TestKnockback(UFortCheatManager* Context, FFrame* Stack)
+{
+	float KnockbackMagnitude;
+	float KnockbackZAngle;
+	FVector ImpulseDir;
+
+	Stack->StepCompiledIn(&KnockbackMagnitude);
+	Stack->StepCompiledIn(&KnockbackZAngle);
+	Stack->StepCompiledIn(&ImpulseDir);
+	Stack->IncrementCode();
+
+	AFortPlayerController* FortPlayerController = Cast<AFortPlayerController>(Context->Outer);
+
+	if (FortPlayerController != NULL)
+		FortPlayerController->ClientMessage(L"Cheat Command not implemented!", FName(), 0.f);
+
+	FortPlayerController->MyFortPawn->ApplyKnockback(KnockbackMagnitude, KnockbackZAngle, ImpulseDir);
 }
 
 void FortCheatManager::GiveWood(UFortCheatManager* Context, FFrame* Stack)
@@ -747,10 +843,12 @@ void FortCheatManager::Setup()
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.ForceServerShutdown"), ForceServerShutdown);
 
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveAllIngredients"), GiveAllIngredients);
+	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveAmmo"), GiveAmmo);
+	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveAthenaConsumables"), GiveAthenaConsumables);
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveConsumable"), GiveConsumable);
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveGadget"), GiveGadget);
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveGadgets"), GiveGadgets);
-	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GivePickaxe"), GivePickaxe);
+	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.TestKnockback"), TestKnockback);
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveResources"), GiveResources);
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveSpecificItem"), GiveSpecificItem);
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveTrap"), GiveTrap);
@@ -760,6 +858,7 @@ void FortCheatManager::Setup()
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveMetal"), GiveMetal);
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveStone"), GiveStone);
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveBluGlo"), GiveBluGlo);
+	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.GiveHeroSpecialization"), SetTeam);
 
 	Utils::Exec(TEXT("/Script/FortniteGame.FortCheatManager.MassSuicide"), MassSuicide);
 
